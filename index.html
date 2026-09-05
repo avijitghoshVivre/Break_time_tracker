@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Break & Login Time Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header class="app-header">
+      <div class="logo-icon">⏱️</div>
+      <h1>Office Break & Login Calculator</h1>
+      <p class="subtitle">Calculate your remaining break time to complete 8 hours without staying past 7:00 PM</p>
+    </header>
+
+    <main class="calculator-grid">
+      <!-- Input Section -->
+      <section class="card input-card">
+        <h2>Input Details</h2>
+        
+        <div class="form-group">
+          <label for="currentLoggedHours">Current Logged-in Time</label>
+          <div class="time-input-group">
+            <div class="input-with-unit">
+              <input type="number" id="currentLoggedHours" min="0" max="24" value="5" placeholder="0">
+              <span>hrs</span>
+            </div>
+            <div class="input-with-unit">
+              <input type="number" id="currentLoggedMins" min="0" max="59" value="30" placeholder="0">
+              <span>mins</span>
+            </div>
+          </div>
+          <small class="help-text">Abhi tak system me kitna login show ho raha hai</small>
+        </div>
+
+        <div class="form-group">
+          <label for="currentTimeInput">Current Clock Time</label>
+          <div class="time-override-group">
+            <input type="time" id="currentTimeInput">
+            <button type="button" id="useRealTimeBtn" class="btn btn-secondary btn-sm" title="Set to current local time">
+              🔄 Use Now
+            </button>
+          </div>
+          <small class="help-text">Abhi kitna baje hai (auto-updates or manual)</small>
+        </div>
+
+        <div class="form-group row-group">
+          <div class="half-width">
+            <label for="checkoutTimeInput">Shift End (Checkout)</label>
+            <input type="time" id="checkoutTimeInput" value="19:00">
+            <small class="help-text">Target: 7:00 PM</small>
+          </div>
+          <div class="half-width">
+            <label for="requiredHoursInput">Required Work</label>
+            <div class="input-with-unit">
+              <input type="number" id="requiredHoursInput" min="1" max="24" value="8">
+              <span>hrs</span>
+            </div>
+            <small class="help-text">Target: 8 hours</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- Output Section -->
+      <section class="card result-card">
+        <h2>Break & Completion Summary</h2>
+        
+        <div class="main-result-box" id="resultBox">
+          <div class="result-badge" id="statusBadge">Calculating...</div>
+          <div class="result-value" id="remainingBreakVal">--</div>
+          <div class="result-label" id="remainingBreakLabel">Remaining Break Allowed</div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span>Logged-in Work Progress</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Metric Details -->
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <span class="metric-icon">💼</span>
+            <div class="metric-info">
+              <span class="metric-label">Work Left Needed</span>
+              <span class="metric-val" id="workRemainingVal">--</span>
+            </div>
+          </div>
+
+          <div class="metric-item">
+            <span class="metric-icon">⌛</span>
+            <div class="metric-info">
+              <span class="metric-label">Time Left till 7 PM</span>
+              <span class="metric-val" id="timeLeftCheckoutVal">--</span>
+            </div>
+          </div>
+
+          <div class="metric-item">
+            <span class="metric-icon">🎯</span>
+            <div class="metric-info">
+              <span class="metric-label">Earliest 8h Completion</span>
+              <span class="metric-val" id="completionTimeVal">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Recommendation Banner -->
+        <div class="recommendation-banner" id="recommendationBanner">
+          <!-- Text will be injected via JS -->
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>💡 <b>Tip:</b> Clear and simple office break manager designed for 8-hour target shifts.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
