@@ -1,5 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Elements
+  // Theme Toggle Logic
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeToggleText = document.getElementById('themeToggleText');
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('workshift_theme', theme);
+    if (themeToggleText) {
+      themeToggleText.textContent = theme === 'dark' ? 'Light' : 'Dark';
+    }
+  }
+
+  const savedTheme = localStorage.getItem('workshift_theme') || 
+    (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  setTheme(savedTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // App Elements
   const currentLoggedHoursEl = document.getElementById('currentLoggedHours');
   const currentLoggedMinsEl = document.getElementById('currentLoggedMins');
   const currentTimeInputEl = document.getElementById('currentTimeInput');
@@ -8,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const requiredHoursInputEl = document.getElementById('requiredHoursInput');
 
   const statusBadgeEl = document.getElementById('statusBadge');
+  const statusBadgeTextEl = document.getElementById('statusBadgeText');
   const remainingBreakValEl = document.getElementById('remainingBreakVal');
   const remainingBreakLabelEl = document.getElementById('remainingBreakLabel');
   const progressBarFillEl = document.getElementById('progressBarFill');
@@ -17,6 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const timeLeftCheckoutValEl = document.getElementById('timeLeftCheckoutVal');
   const completionTimeValEl = document.getElementById('completionTimeVal');
   const recommendationBannerEl = document.getElementById('recommendationBanner');
+
+  const checkoutPresetsEl = document.getElementById('checkoutPresets');
+  const hoursPresetsEl = document.getElementById('hoursPresets');
 
   let isManualTimeOverride = false;
 
@@ -46,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Format Helper: Minutes from Midnight to 12-hour AM/PM Time String
   function formatMinutesToTime(minsFromMidnight) {
-    // Handle wrap around next day if needed
     let normalized = minsFromMidnight % (24 * 60);
     if (normalized < 0) normalized += 24 * 60;
 
@@ -67,6 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return (h || 0) * 60 + (m || 0);
   }
 
+  // Active Chip Highlighter
+  function updatePresetChips(container, activeVal) {
+    if (!container) return;
+    const chips = container.querySelectorAll('.chip');
+    chips.forEach(chip => {
+      if (chip.dataset.value === String(activeVal)) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+  }
+
   // Core Calculation Function
   function calculate() {
     const loggedHours = parseInt(currentLoggedHoursEl.value) || 0;
@@ -78,6 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const currentTimeMins = timeStringToMinutes(currentTimeInputEl.value);
     const checkoutTimeMins = timeStringToMinutes(checkoutTimeInputEl.value);
+
+    // Sync chip highlights
+    updatePresetChips(checkoutPresetsEl, checkoutTimeInputEl.value);
+    updatePresetChips(hoursPresetsEl, requiredHoursInputEl.value);
 
     // 1. Work remaining
     const workRemainingMins = Math.max(0, totalRequiredMins - totalLoggedMins);
@@ -91,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
       timeLeftCheckoutValEl.textContent = `${formatMins(Math.abs(timeLeftTillCheckoutMins))} past checkout`;
     }
 
-    // 3. Earliest Completion Time (if no further breaks taken)
+    // 3. Earliest Completion Time
     const earliestCompletionMins = currentTimeMins + workRemainingMins;
     completionTimeValEl.textContent = formatMinutesToTime(earliestCompletionMins);
 
@@ -103,50 +146,69 @@ document.addEventListener('DOMContentLoaded', () => {
     progressBarFillEl.style.width = `${progressPct}%`;
     progressPercentEl.textContent = `${progressPct}%`;
 
-    // 6. Badge & Banner Messaging
+    // 6. Status & Recommendation Banner Messaging
     const formattedCheckoutTime = formatMinutesToTime(checkoutTimeMins);
 
     if (totalLoggedMins >= totalRequiredMins) {
       // Completed Goal
-      statusBadgeEl.className = 'result-badge badge-green';
-      statusBadgeEl.textContent = '🎉 Goal Completed';
+      statusBadgeEl.className = 'result-status-pill pill-green';
+      statusBadgeTextEl.textContent = 'Goal Completed';
       remainingBreakValEl.textContent = '0 mins';
-      remainingBreakLabelEl.textContent = 'Required login hours completed!';
+      remainingBreakLabelEl.textContent = 'Required login target achieved!';
       recommendationBannerEl.style.borderColor = 'var(--accent-green)';
-      recommendationBannerEl.style.background = 'rgba(34, 197, 94, 0.1)';
-      recommendationBannerEl.innerHTML = `✅ Aapka <b>${requiredHours} hours</b> login target already complete ho gaya hai! Aap abhi checkout kar sakte hain.`;
+      recommendationBannerEl.style.background = 'var(--accent-green-bg)';
+      recommendationBannerEl.innerHTML = `<strong>Goal Achieved:</strong> Aapka <b>${requiredHours} hours</b> login target complete ho chuka hai. Aap ab checkout kar sakte hain!`;
     } else if (remainingBreakMins > 0) {
       // Positive break remaining
-      statusBadgeEl.className = 'result-badge badge-green';
-      statusBadgeEl.textContent = '✅ Break Available';
+      statusBadgeEl.className = 'result-status-pill pill-green';
+      statusBadgeTextEl.textContent = 'Break Available';
       remainingBreakValEl.textContent = formatMins(remainingBreakMins);
-      remainingBreakLabelEl.textContent = `Remaining break buffer left before ${formattedCheckoutTime}`;
+      remainingBreakLabelEl.textContent = `Break buffer remaining before ${formattedCheckoutTime}`;
       recommendationBannerEl.style.borderColor = 'var(--accent-green)';
-      recommendationBannerEl.style.background = 'rgba(34, 197, 94, 0.1)';
-      recommendationBannerEl.innerHTML = `🟢 Aap abhi <b>${formatMins(remainingBreakMins)}</b> ka break le sakte hain. Iske baad bhi aapka 8 hours login <b>${formattedCheckoutTime}</b> tak exact complete ho jayega.`;
+      recommendationBannerEl.style.background = 'var(--accent-green-bg)';
+      recommendationBannerEl.innerHTML = `<strong>Buffer Available:</strong> Aap abhi <b>${formatMins(remainingBreakMins)}</b> ka break le sakte hain. Iske baad bhi aapka target <b>${formattedCheckoutTime}</b> tak exact complete ho jayega.`;
     } else if (remainingBreakMins === 0) {
       // Exactly on track
-      statusBadgeEl.className = 'result-badge badge-amber';
-      statusBadgeEl.textContent = '⚡ On Exact Track';
+      statusBadgeEl.className = 'result-status-pill pill-amber';
+      statusBadgeTextEl.textContent = 'On Exact Track';
       remainingBreakValEl.textContent = '0 mins';
-      remainingBreakLabelEl.textContent = `No break left if checking out at ${formattedCheckoutTime}`;
+      remainingBreakLabelEl.textContent = `Zero break margin for ${formattedCheckoutTime} checkout`;
       recommendationBannerEl.style.borderColor = 'var(--accent-amber)';
-      recommendationBannerEl.style.background = 'rgba(245, 158, 11, 0.1)';
-      recommendationBannerEl.innerHTML = `🟠 Aap exact on track hain. <b>${formattedCheckoutTime}</b> tak 8 hours complete karne ke liye abhi se continuously logged in rehna padega (no more breaks).`;
+      recommendationBannerEl.style.background = 'var(--accent-amber-bg)';
+      recommendationBannerEl.innerHTML = `<strong>On Exact Track:</strong> <b>${formattedCheckoutTime}</b> checkout ke liye abhi se continuously logged in rehna padega (no more breaks).`;
     } else {
       // Negative break remaining (shortage)
       const shortageMins = Math.abs(remainingBreakMins);
-      statusBadgeEl.className = 'result-badge badge-red';
-      statusBadgeEl.textContent = '⚠️ Shortage Warning';
+      statusBadgeEl.className = 'result-status-pill pill-red';
+      statusBadgeTextEl.textContent = 'Shortage Warning';
       remainingBreakValEl.textContent = `-${formatMins(shortageMins)}`;
       remainingBreakLabelEl.textContent = `Time short for ${formattedCheckoutTime} checkout`;
       recommendationBannerEl.style.borderColor = 'var(--accent-red)';
-      recommendationBannerEl.style.background = 'rgba(239, 68, 68, 0.1)';
-      recommendationBannerEl.innerHTML = `🔴 <b>${formattedCheckoutTime}</b> tak aapka 8 hours complete nahi hoga (${formatMins(shortageMins)} short). 8 hours pure karne ke liye aapko <b>${formatMinutesToTime(earliestCompletionMins)}</b> tak rukna padega.`;
+      recommendationBannerEl.style.background = 'var(--accent-red-bg)';
+      recommendationBannerEl.innerHTML = `<strong>Time Shortage:</strong> <b>${formattedCheckoutTime}</b> tak target complete nahi hoga (${formatMins(shortageMins)} short). Target poora karne ke liye aapko <b>${formatMinutesToTime(earliestCompletionMins)}</b> tak work karna hoga.`;
     }
   }
 
-  // Event Listeners
+  // Event Listeners for Preset Chips
+  if (checkoutPresetsEl) {
+    checkoutPresetsEl.addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      checkoutTimeInputEl.value = chip.dataset.value;
+      calculate();
+    });
+  }
+
+  if (hoursPresetsEl) {
+    hoursPresetsEl.addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      requiredHoursInputEl.value = chip.dataset.value;
+      calculate();
+    });
+  }
+
+  // Input Event Listeners
   currentLoggedHoursEl.addEventListener('input', calculate);
   currentLoggedMinsEl.addEventListener('input', calculate);
   checkoutTimeInputEl.addEventListener('input', calculate);

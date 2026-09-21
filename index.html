@@ -1,76 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Office Break & Login Time Calculator</title>
+  <title>WorkShift - Office Break & Shift Tracker</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
+  <div class="background-grid"></div>
+  
+  <div class="app-shell">
+    <!-- Navbar / Top Header -->
+    <nav class="navbar">
+      <div class="brand-badge">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <span class="brand-title">WorkShift</span>
+      </div>
+
+      <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle theme">
+        <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span id="themeToggleText">Light</span>
+      </button>
+    </nav>
+
+    <!-- Main Header -->
     <header class="app-header">
-      <div class="logo-icon">⏱️</div>
-      <h1>Office Break & Login Calculator</h1>
-      <p class="subtitle">Calculate your remaining break time to complete 8 hours without staying past 7:00 PM</p>
+      <h1 class="main-heading">Office Break & Shift Tracker</h1>
+      <p class="subtitle">Calculate your remaining break margin to finish your required work hours on time.</p>
     </header>
 
     <main class="calculator-grid">
-      <!-- Input Section -->
+      <!-- Input Card -->
       <section class="card input-card">
-        <h2>Input Details</h2>
+        <div class="card-header">
+          <div class="card-title-group">
+            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <h2>Shift Parameters</h2>
+          </div>
+        </div>
         
         <div class="form-group">
-          <label for="currentLoggedHours">Current Logged-in Time</label>
+          <label for="currentLoggedHours">Current Logged-in Duration</label>
           <div class="time-input-group">
             <div class="input-with-unit">
               <input type="number" id="currentLoggedHours" min="0" max="24" value="5" placeholder="0">
-              <span>hrs</span>
+              <span class="unit-label">hrs</span>
             </div>
             <div class="input-with-unit">
               <input type="number" id="currentLoggedMins" min="0" max="59" value="30" placeholder="0">
-              <span>mins</span>
+              <span class="unit-label">mins</span>
             </div>
           </div>
-          <small class="help-text">Abhi tak system me kitna login show ho raha hai</small>
+          <span class="help-text">Hours & minutes recorded in your attendance portal</span>
         </div>
 
         <div class="form-group">
           <label for="currentTimeInput">Current Clock Time</label>
           <div class="time-override-group">
             <input type="time" id="currentTimeInput">
-            <button type="button" id="useRealTimeBtn" class="btn btn-secondary btn-sm" title="Set to current local time">
-              🔄 Use Now
+            <button type="button" id="useRealTimeBtn" class="btn btn-secondary" title="Sync with current system clock">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              <span>Use Now</span>
             </button>
           </div>
-          <small class="help-text">Abhi kitna baje hai (auto-updates or manual)</small>
         </div>
 
-        <div class="form-group row-group">
-          <div class="half-width">
-            <label for="checkoutTimeInput">Shift End (Checkout)</label>
-            <input type="time" id="checkoutTimeInput" value="19:00">
-            <small class="help-text">Target: 7:00 PM</small>
+        <div class="form-group">
+          <div class="label-with-presets">
+            <label for="checkoutTimeInput">Target Shift End (Checkout)</label>
           </div>
-          <div class="half-width">
-            <label for="requiredHoursInput">Required Work</label>
-            <div class="input-with-unit">
-              <input type="number" id="requiredHoursInput" min="1" max="24" value="8">
-              <span>hrs</span>
-            </div>
-            <small class="help-text">Target: 8 hours</small>
+          <input type="time" id="checkoutTimeInput" value="19:00">
+          <div class="preset-chips" id="checkoutPresets">
+            <span class="preset-label">Presets:</span>
+            <button type="button" class="chip" data-value="17:00">5:00 PM</button>
+            <button type="button" class="chip" data-value="18:00">6:00 PM</button>
+            <button type="button" class="chip active" data-value="19:00">7:00 PM</button>
+            <button type="button" class="chip" data-value="20:00">8:00 PM</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-with-presets">
+            <label for="requiredHoursInput">Required Work Goal</label>
+          </div>
+          <div class="input-with-unit">
+            <input type="number" id="requiredHoursInput" min="1" max="24" step="0.5" value="8">
+            <span class="unit-label">hrs</span>
+          </div>
+          <div class="preset-chips" id="hoursPresets">
+            <span class="preset-label">Goal:</span>
+            <button type="button" class="chip active" data-value="8">8 hrs</button>
+            <button type="button" class="chip" data-value="8.5">8.5 hrs</button>
+            <button type="button" class="chip" data-value="9">9 hrs</button>
           </div>
         </div>
       </section>
 
-      <!-- Output Section -->
+      <!-- Output Card -->
       <section class="card result-card">
-        <h2>Break & Completion Summary</h2>
+        <div class="card-header">
+          <div class="card-title-group">
+            <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <h2>Break Buffer & Summary</h2>
+          </div>
+        </div>
         
         <div class="main-result-box" id="resultBox">
-          <div class="result-badge" id="statusBadge">Calculating...</div>
+          <div class="result-status-pill" id="statusBadge">
+            <span class="status-dot"></span>
+            <span id="statusBadgeText">Calculating...</span>
+          </div>
           <div class="result-value" id="remainingBreakVal">--</div>
           <div class="result-label" id="remainingBreakLabel">Remaining Break Allowed</div>
         </div>
@@ -78,36 +148,51 @@
         <!-- Progress Bar -->
         <div class="progress-section">
           <div class="progress-header">
-            <span>Logged-in Work Progress</span>
-            <span id="progressPercent">0%</span>
+            <span>Shift Goal Progress</span>
+            <span class="progress-badge" id="progressPercent">0%</span>
           </div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
           </div>
         </div>
 
-        <!-- Metric Details -->
+        <!-- Metrics List -->
         <div class="metrics-grid">
           <div class="metric-item">
-            <span class="metric-icon">💼</span>
+            <div class="metric-icon-wrapper blue">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
             <div class="metric-info">
-              <span class="metric-label">Work Left Needed</span>
+              <span class="metric-label">Work Time Remaining</span>
               <span class="metric-val" id="workRemainingVal">--</span>
             </div>
           </div>
 
           <div class="metric-item">
-            <span class="metric-icon">⌛</span>
+            <div class="metric-icon-wrapper amber">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
             <div class="metric-info">
-              <span class="metric-label">Time Left till 7 PM</span>
+              <span class="metric-label">Time Remaining till Checkout</span>
               <span class="metric-val" id="timeLeftCheckoutVal">--</span>
             </div>
           </div>
 
           <div class="metric-item">
-            <span class="metric-icon">🎯</span>
+            <div class="metric-icon-wrapper green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
             <div class="metric-info">
-              <span class="metric-label">Earliest 8h Completion</span>
+              <span class="metric-label">Earliest Goal Completion</span>
               <span class="metric-val" id="completionTimeVal">--</span>
             </div>
           </div>
@@ -115,13 +200,13 @@
 
         <!-- Dynamic Recommendation Banner -->
         <div class="recommendation-banner" id="recommendationBanner">
-          <!-- Text will be injected via JS -->
+          <!-- Injected via JS -->
         </div>
       </section>
     </main>
 
     <footer class="app-footer">
-      <p>💡 <b>Tip:</b> Clear and simple office break manager designed for 8-hour target shifts.</p>
+      <p>WorkShift Tracker &bull; Designed for accurate shift & break management.</p>
     </footer>
   </div>
 
